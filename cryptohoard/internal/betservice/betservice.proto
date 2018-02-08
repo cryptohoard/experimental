@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package betservice;
+
+import "google/protobuf/timestamp.proto";
+
+service BetService {
+  rpc ListBets(BetFilter) returns (stream Bet) {}
+
+  rpc CreateBet(BetServiceRequest) returns (BetServiceResponse) {}
+
+  rpc CancelBet(BetCancelRequest) returns (BetServiceResponse) {}
+}
+
+enum Product {
+  PRODUCT_NONE   = 0;
+  BTCUSD         = 1;
+  BCHUSD         = 2;
+  ETHUSD         = 3;
+  LTCUSD         = 4;
+}
+
+message BetServiceRequest {
+  string bet_id        = 1;
+  string customer_id   = 2;
+  string exchange      = 3;
+  Product product      = 4;
+  int32 amount         = 5;
+  int32 profit_percent = 6;
+  int32 loss_percent   = 7;
+}
+
+message BetCancelRequest {
+  string bet_id = 1;
+}
+
+enum State {
+  STATE_NONE = 0;
+  PROCESSING = 1;
+  PLACED     = 2;
+  CASHOUT    = 3;
+  PAYOUT     = 4;
+}
+
+message Bet {
+  string bet_id                           = 1;
+  string customer_id                      = 2;
+  string exchange                         = 3;
+  Product product                         = 4;
+  int32 initial_amount                    = 5;
+  int32 current_amount                    = 6;
+  float crypto_currency                   = 7;
+  int32 profit_percent                    = 8;
+  int32 loss_percent                      = 9;
+  State state                             = 10;
+  google.protobuf.Timestamp creation_time = 11;
+  google.protobuf.Timestamp closed_time   = 12;
+}
+
+message BetFilter {
+  Product product = 1;
+  State state     = 2;
+}
+
+message BetServiceResponse {
+  bool success = 1;
+  Bet bet      = 2;
+}
